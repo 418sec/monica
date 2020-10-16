@@ -39,7 +39,7 @@ class AuditLogHelper
                     $description = trans('logs.settings_log_'.$log->action.'_with_name', ['name' => $log->object->{'contact_name'}]);
                 }
             } else {
-                $description = trans('logs.settings_log_'.$log->action, ['name' => htmlentities($log->object->{'name'}, ENT_QUOTES, 'utf-8')]);
+                $description = trans('logs.settings_log_'.$log->action, ['name' => $log->object->{'name'}]);
             }
 
             $logsCollection->push([

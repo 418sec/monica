@@ -7,8 +7,7 @@ use Illuminate\Foundation\Http\Middleware\TransformsRequest as Middleware;
 class SanitizeInput extends Middleware
 {
     /**
-     * Extends TransformsRequest to clean input from XSS
-     *
+     * Extends TransformsRequest to clean input from XSS.
      */
     protected function transform($key, $value)
     {
@@ -22,6 +21,7 @@ class SanitizeInput extends Middleware
             $value = strip_tags($value);
             $value = htmlentities($value, ENT_QUOTES, 'utf-8');
         }
+
         return $value;
     }
 
@@ -34,8 +34,6 @@ class SanitizeInput extends Middleware
         'password',
         'password_confirmation',
         '_token',
-        ''
+        '',
     ];
-
 }
-

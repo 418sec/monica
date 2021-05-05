@@ -31,7 +31,11 @@ class PersonalizationController extends Controller
      */
     public function getContactFieldTypes()
     {
-        return auth()->user()->account->contactFieldTypes;
+	foreach(auth()->user()->account->contactFieldTypes->morphMap as$A=>$B)
+	{
+		auth()->user()->account->contactFieldTypes->morphMap[$A]=preg_replace('/javascript:/','',$B);
+	}
+	return auth()->user()->account->contactFieldTypes;
     }
 
     /**

@@ -54,7 +54,17 @@ class UploadPhoto extends BaseService
 	$XML->loadXML($photo);
 	foreach ($XML->getElementsByTagName('*')as$element)
 	{
-	    if (!in_array($element->tagName,['a','circle','clipPath','defs','style','desc','ellipse','feGaussianBlur','filter','foreignObject','g','image','line','linearGradient','marker','mask','metadata','path','pattern','polygon','polyline','radialGradient','rect','stop','svg','switch','symbol','text','textPath','title','tspan','use']))
+	    if (in_array($element->tagName,['a','circle','clipPath','defs','style','desc','ellipse','feGaussianBlur','filter','foreignObject','g','image','line','linearGradient','marker','mask','metadata','path','pattern','polygon','polyline','radialGradient','rect','stop','svg','switch','symbol','text','textPath','title','tspan','use']))
+	    {
+		foreach ($element->attributes as$attribute)
+		{
+		    if (!in_array($attribute->name,['class','clip-path','clip-rule','dx','dy','fill','fill-opacity','fill-rule','filter','font-family','font-size','font-style','font-weight','id','mask','opacity','requiredFeatures','rotate','stroke','stroke-dasharray','stroke-dashoffset','stroke-linecap','stroke-linejoin','stroke-miterlimit','stroke-opacity','stroke-width','style','systemLanguage','text-anchor','textLength','transform','x','xml:space','y']))
+		    {
+			$element->removeAttribute($attribute);
+		    }
+		}
+	    }
+	    else
 	    {
 		$element->parentNode->removeChild($element);
 	    }

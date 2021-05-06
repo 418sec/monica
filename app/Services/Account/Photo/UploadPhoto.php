@@ -13,6 +13,7 @@ use App\Models\Contact\Contact;
 use function Safe\base64_decode;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Testing\FileFactory;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Exception\NotReadableException;
 
@@ -39,6 +40,26 @@ class UploadPhoto extends BaseService
             'data' => 'required_without:photo|string|photo',
             'extension' => 'nullable|string',
         ];
+    }
+
+    /**
+    * Sanitise a *.svg file.
+    *
+    * @param string $photo
+    * @return string
+    */
+    private function sanitiseSVG(string $photo): string
+    {
+	$XML = new DOMDocument();
+	$XML->loadXML($photo);
+	foreach ($XML->getElementsByTagName('*')as$element)
+	{
+	    if (!in_array($element->tagName,['a','circle','clipPath','defs','style','desc','ellipse','feGaussianBlur','filter','foreignObject','g','image','line','linearGradient','marker','mask','metadata','path','pattern','polygon','polyline','radialGradient','rect','stop','svg','switch','symbol','text','textPath','title','tspan','use']))
+	    {
+		$element->parentNode->removeChild($element);
+	    }
+	}
+	return $XML->saveXML();
     }
 
     /**
@@ -78,7 +99,10 @@ class UploadPhoto extends BaseService
     private function importPhoto($data): array
     {
         $photo = $data['photo'];
-
+	if ($photo->extension == 'svg')
+	{
+	   $photo = new FileFactory->createWithContent($this->sanitiseSVG($photo->get()));
+	}
         return [
             'account_id' => $data['account_id'],
             'original_filename' => $photo->getClientOriginalName(),
@@ -96,7 +120,10 @@ class UploadPhoto extends BaseService
     private function importFile(array $data): ?array
     {
         $filename = Str::random(40);
-
+	if ($data['extension'] == 'svg')
+	{
+	    $data['data']=$this->sanitiseSVG($data['data']);
+	}
         try {
             $image = Image::make($data['data']);
         } catch (NotReadableException $e) {
